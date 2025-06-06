@@ -1,0 +1,553 @@
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Signal Trading App - Versi Keren</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+  />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+    /* Scrollbar for user list */
+    #users-ul {
+      max-height: 180px;
+      overflow-y: auto;
+    }
+    #users-ul::-webkit-scrollbar {
+      width: 6px;
+    }
+    #users-ul::-webkit-scrollbar-thumb {
+      background-color: #7c3aed;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body class="flex flex-col min-h-screen">
+  <div id="app" class="flex-grow flex flex-col max-w-5xl mx-auto w-full px-6 py-8">
+    <!-- Login Screen -->
+    <section id="login-screen" class="max-w-md w-full mx-auto bg-white rounded-3xl shadow-2xl p-10">
+      <h1 class="text-4xl font-extrabold mb-8 text-center text-indigo-700 tracking-wide drop-shadow-lg">Signal Trading Login</h1>
+      <form id="login-form" class="space-y-8" autocomplete="off" novalidate>
+        <div>
+          <label for="username" class="block mb-3 font-semibold text-gray-700">Username</label>
+          <input
+            type="text"
+            id="username"
+            name="username"
+            required
+            class="w-full px-5 py-3 border-2 border-indigo-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-400 transition shadow-md"
+            placeholder="Masukkan username"
+            autofocus
+          />
+        </div>
+        <div>
+          <label for="password" class="block mb-3 font-semibold text-gray-700">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            required
+            class="w-full px-5 py-3 border-2 border-indigo-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-400 transition shadow-md"
+            placeholder="Masukkan password"
+          />
+        </div>
+        <button
+          type="submit"
+          class="w-full bg-gradient-to-r from-purple-600 to-indigo-700 hover:from-purple-700 hover:to-indigo-800 text-white font-extrabold py-4 rounded-3xl shadow-lg transform hover:scale-105 transition"
+        >
+          <i class="fas fa-sign-in-alt mr-2"></i> Masuk
+        </button>
+      </form>
+      <p id="login-error" class="mt-6 text-center text-red-600 font-semibold hidden select-none"></p>
+    </section>
+
+    <!-- Admin Dashboard -->
+    <section id="admin-dashboard" class="hidden flex flex-col space-y-10">
+      <header class="flex justify-between items-center border-b border-indigo-400 pb-5">
+        <h2 class="text-4xl font-extrabold text-white tracking-wide drop-shadow-lg flex items-center gap-3">
+          <i class="fas fa-user-shield text-indigo-300"></i> Admin Dashboard
+        </h2>
+        <button id="admin-logout" class="text-red-400 hover:text-red-600 font-bold text-lg flex items-center gap-2 transition">
+          <i class="fas fa-sign-out-alt"></i> Keluar
+        </button>
+      </header>
+
+      <!-- Signal Management -->
+      <div class="bg-white bg-opacity-90 rounded-3xl shadow-2xl p-8 max-w-3xl mx-auto">
+        <h3 class="text-3xl font-extrabold mb-6 text-indigo-700 tracking-wide flex items-center gap-3">
+          <i class="fas fa-bullhorn text-indigo-500"></i> Kelola Signal Trading
+        </h3>
+        <form id="signal-form" class="space-y-6" autocomplete="off" novalidate>
+          <div>
+            <label for="signal-type" class="block mb-2 font-semibold text-gray-700">Tipe Signal</label>
+            <select
+              id="signal-type"
+              required
+              class="w-full px-5 py-3 border-2 border-indigo-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-400 transition shadow-md"
+            >
+              <option value="" disabled selected>Pilih tipe signal</option>
+              <option value="Buy">Buy</option>
+              <option value="Sell">Sell</option>
+              <option value="Pesan">Pesan</option>
+            </select>
+          </div>
+          <div>
+            <label for="signal-text" class="block mb-2 font-semibold text-gray-700">Isi Signal</label>
+            <textarea
+              id="signal-text"
+              rows="4"
+              required
+              placeholder="Masukkan isi signal trading terbaru..."
+              class="w-full px-5 py-4 border-2 border-indigo-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-400 resize-none shadow-md"
+            ></textarea>
+          </div>
+          <button
+            type="submit"
+            class="bg-gradient-to-r from-purple-600 to-indigo-700 hover:from-purple-700 hover:to-indigo-800 text-white font-extrabold py-4 px-10 rounded-3xl shadow-lg transform hover:scale-105 transition flex items-center gap-3"
+          >
+            <i class="fas fa-paper-plane"></i> Kirim Signal
+          </button>
+        </form>
+        <div id="signal-current" class="mt-8 p-6 rounded-2xl border-2 border-indigo-400 bg-indigo-50 flex items-center gap-4 shadow-lg min-h-[4rem]">
+          <div id="signal-icon" class="text-4xl font-extrabold text-indigo-700 flex items-center justify-center w-14 h-14 rounded-full bg-indigo-200 shadow-inner">
+            <i class="fas fa-bullhorn"></i>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-indigo-900 font-extrabold text-lg" id="signal-type-display">Belum ada signal</span>
+            <p class="text-indigo-800 font-semibold" id="signal-text-display">Belum ada signal terkirim.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- User Management -->
+      <div class="bg-white bg-opacity-90 rounded-3xl shadow-2xl p-8 max-w-3xl mx-auto">
+        <h3 class="text-3xl font-extrabold mb-6 text-indigo-700 tracking-wide flex items-center gap-3">
+          <i class="fas fa-users-cog text-indigo-500"></i> Manajemen Akun Pengguna
+        </h3>
+        <form id="user-form" class="space-y-6" autocomplete="off" novalidate>
+          <div>
+            <label for="new-username" class="block mb-2 font-semibold text-gray-700">Username Baru</label>
+            <input
+              type="text"
+              id="new-username"
+              name="new-username"
+              required
+              placeholder="Username pengguna baru"
+              class="w-full px-5 py-3 border-2 border-indigo-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-400 shadow-md"
+            />
+          </div>
+          <div>
+            <label for="new-password" class="block mb-2 font-semibold text-gray-700">Password Baru</label>
+            <input
+              type="password"
+              id="new-password"
+              name="new-password"
+              required
+              placeholder="Password pengguna baru"
+              class="w-full px-5 py-3 border-2 border-indigo-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-400 shadow-md"
+            />
+          </div>
+          <button
+            type="submit"
+            class="bg-gradient-to-r from-purple-600 to-indigo-700 hover:from-purple-700 hover:to-indigo-800 text-white font-extrabold py-4 px-10 rounded-3xl shadow-lg transform hover:scale-105 transition flex items-center gap-3"
+          >
+            <i class="fas fa-user-plus"></i> Buat Akun
+          </button>
+        </form>
+        <div id="user-list" class="mt-10">
+          <h4 class="font-extrabold text-indigo-700 mb-4 text-2xl flex items-center gap-3">
+            <i class="fas fa-list-ul text-indigo-500"></i> Daftar Pengguna
+          </h4>
+          <ul class="list-none text-gray-800 space-y-3" id="users-ul">
+            <!-- User items will appear here -->
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- User Dashboard -->
+    <section id="user-dashboard" class="hidden flex flex-col space-y-10">
+      <header class="flex justify-between items-center border-b border-indigo-400 pb-5">
+        <h2 class="text-4xl font-extrabold text-white tracking-wide drop-shadow-lg flex items-center gap-3">
+          <i class="fas fa-user text-indigo-300"></i> Dashboard Pengguna
+        </h2>
+        <button id="user-logout" class="text-red-400 hover:text-red-600 font-bold text-lg flex items-center gap-2 transition">
+          <i class="fas fa-sign-out-alt"></i> Keluar
+        </button>
+      </header>
+
+      <div class="bg-white bg-opacity-90 rounded-3xl shadow-2xl p-8 max-w-3xl mx-auto">
+        <h3 class="text-3xl font-extrabold mb-6 text-indigo-700 tracking-wide flex items-center gap-3">
+          <i class="fas fa-bullhorn text-indigo-500"></i> Signal Trading Terbaru
+        </h3>
+        <div id="user-signal-display" class="p-8 rounded-2xl border-2 border-indigo-400 bg-indigo-50 flex items-center gap-6 shadow-lg min-h-[6rem]">
+          <div id="user-signal-icon" class="text-5xl font-extrabold text-indigo-700 flex items-center justify-center w-16 h-16 rounded-full bg-indigo-200 shadow-inner">
+            <i class="fas fa-bullhorn"></i>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-indigo-900 font-extrabold text-2xl" id="user-signal-type">Belum ada signal</span>
+            <p class="text-indigo-800 font-semibold text-lg" id="user-signal-text">Belum ada signal terkirim oleh admin.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    (() => {
+      // Hardcoded admin credentials
+      const ADMIN_USERNAME = "Ilham";
+      const ADMIN_PASSWORD = "592007";
+
+      // LocalStorage keys
+      const LS_USERS_KEY = "signalTradingUsers";
+      const LS_SIGNAL_KEY = "signalTradingCurrentSignal";
+      const LS_SIGNAL_TYPE_KEY = "signalTradingCurrentSignalType";
+      const LS_LOGGED_USER_KEY = "signalTradingLoggedUser";
+
+      // Elements
+      const loginScreen = document.getElementById("login-screen");
+      const adminDashboard = document.getElementById("admin-dashboard");
+      const userDashboard = document.getElementById("user-dashboard");
+
+      const loginForm = document.getElementById("login-form");
+      const loginError = document.getElementById("login-error");
+
+      const adminLogoutBtn = document.getElementById("admin-logout");
+      const userLogoutBtn = document.getElementById("user-logout");
+
+      const signalForm = document.getElementById("signal-form");
+      const signalTextInput = document.getElementById("signal-text");
+      const signalTypeSelect = document.getElementById("signal-type");
+      const signalTextDisplay = document.getElementById("signal-text-display");
+      const signalTypeDisplay = document.getElementById("signal-type-display");
+      const signalIcon = document.getElementById("signal-icon");
+
+      const userForm = document.getElementById("user-form");
+      const newUsernameInput = document.getElementById("new-username");
+      const newPasswordInput = document.getElementById("new-password");
+      const usersUl = document.getElementById("users-ul");
+
+      const userSignalText = document.getElementById("user-signal-text");
+      const userSignalType = document.getElementById("user-signal-type");
+      const userSignalIcon = document.getElementById("user-signal-icon");
+
+      // Initialize users in localStorage if not present
+      function initUsers() {
+        let users = JSON.parse(localStorage.getItem(LS_USERS_KEY));
+        if (!users) {
+          // Initialize with empty array (no users except admin)
+          users = [];
+          localStorage.setItem(LS_USERS_KEY, JSON.stringify(users));
+        }
+        return users;
+      }
+
+      // Save users to localStorage
+      function saveUsers(users) {
+        localStorage.setItem(LS_USERS_KEY, JSON.stringify(users));
+      }
+
+      // Get current signal from localStorage
+      function getCurrentSignal() {
+        return localStorage.getItem(LS_SIGNAL_KEY) || "";
+      }
+
+      // Save current signal to localStorage
+      function saveCurrentSignal(signal) {
+        localStorage.setItem(LS_SIGNAL_KEY, signal);
+      }
+
+      // Get current signal type from localStorage
+      function getCurrentSignalType() {
+        return localStorage.getItem(LS_SIGNAL_TYPE_KEY) || "";
+      }
+
+      // Save current signal type to localStorage
+      function saveCurrentSignalType(type) {
+        localStorage.setItem(LS_SIGNAL_TYPE_KEY, type);
+      }
+
+      // Save logged user to localStorage
+      function saveLoggedUser(username) {
+        localStorage.setItem(LS_LOGGED_USER_KEY, username);
+      }
+
+      // Get logged user from localStorage
+      function getLoggedUser() {
+        return localStorage.getItem(LS_LOGGED_USER_KEY);
+      }
+
+      // Remove logged user from localStorage
+      function removeLoggedUser() {
+        localStorage.removeItem(LS_LOGGED_USER_KEY);
+      }
+
+      // Render user list in admin dashboard with delete buttons
+      function renderUserList() {
+        const users = initUsers();
+        usersUl.innerHTML = "";
+        if (users.length === 0) {
+          const li = document.createElement("li");
+          li.textContent = "Belum ada pengguna terdaftar.";
+          li.className = "italic text-gray-500 text-center py-4 select-none";
+          usersUl.appendChild(li);
+          return;
+        }
+        users.forEach((user) => {
+          const li = document.createElement("li");
+          li.className = "flex justify-between items-center bg-indigo-100 rounded-xl px-5 py-3 shadow-md hover:bg-indigo-200 transition";
+
+          const usernameSpan = document.createElement("span");
+          usernameSpan.textContent = user.username;
+          usernameSpan.className = "font-semibold text-indigo-900 select-text";
+
+          const delBtn = document.createElement("button");
+          delBtn.className = "text-red-600 hover:text-red-800 transition rounded-full p-2";
+          delBtn.title = `Hapus akun ${user.username}`;
+          delBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
+          delBtn.addEventListener("click", () => {
+            if (confirm(`Yakin ingin menghapus akun pengguna "${user.username}"?`)) {
+              deleteUser(user.username);
+            }
+          });
+
+          li.appendChild(usernameSpan);
+          li.appendChild(delBtn);
+          usersUl.appendChild(li);
+        });
+      }
+
+      // Delete user by username
+      function deleteUser(username) {
+        let users = initUsers();
+        users = users.filter((u) => u.username.toLowerCase() !== username.toLowerCase());
+        saveUsers(users);
+        renderUserList();
+        alert(`Akun pengguna "${username}" berhasil dihapus.`);
+      }
+
+      // Show section by id, hide others
+      function showSection(sectionId) {
+        loginScreen.classList.add("hidden");
+        adminDashboard.classList.add("hidden");
+        userDashboard.classList.add("hidden");
+
+        if (sectionId === "login") loginScreen.classList.remove("hidden");
+        else if (sectionId === "admin") adminDashboard.classList.remove("hidden");
+        else if (sectionId === "user") userDashboard.classList.remove("hidden");
+      }
+
+      // Update signal icon and colors based on type
+      function updateSignalIconAndColors(type) {
+        let iconClass = "fas fa-bullhorn";
+        let bgColor = "bg-indigo-200";
+        let textColor = "text-indigo-700";
+        let borderColor = "border-indigo-400";
+
+        switch (type) {
+          case "Buy":
+            iconClass = "fas fa-arrow-up";
+            bgColor = "bg-green-200";
+            textColor = "text-green-700";
+            borderColor = "border-green-400";
+            break;
+          case "Sell":
+            iconClass = "fas fa-arrow-down";
+            bgColor = "bg-red-200";
+            textColor = "text-red-700";
+            borderColor = "border-red-400";
+            break;
+          case "Pesan":
+            iconClass = "fas fa-comment-alt";
+            bgColor = "bg-yellow-200";
+            textColor = "text-yellow-700";
+            borderColor = "border-yellow-400";
+            break;
+          default:
+            iconClass = "fas fa-bullhorn";
+            bgColor = "bg-indigo-200";
+            textColor = "text-indigo-700";
+            borderColor = "border-indigo-400";
+        }
+
+        // Admin signal icon
+        signalIcon.className = `text-4xl font-extrabold flex items-center justify-center w-14 h-14 rounded-full shadow-inner ${bgColor} ${textColor}`;
+        signalIcon.innerHTML = `<i class="${iconClass}"></i>`;
+        signalTextDisplay.className = `text-${textColor.replace("text-", "")}-900 font-extrabold text-lg`;
+        signalTypeDisplay.className = `text-${textColor.replace("text-", "")}-900 font-extrabold text-lg`;
+
+        // Admin signal container border color
+        document.getElementById("signal-current").className = `mt-8 p-6 rounded-2xl border-2 ${borderColor} bg-indigo-50 flex items-center gap-4 shadow-lg min-h-[4rem]`;
+
+        // User signal icon
+        userSignalIcon.className = `text-5xl font-extrabold flex items-center justify-center w-16 h-16 rounded-full shadow-inner ${bgColor} ${textColor}`;
+        userSignalIcon.innerHTML = `<i class="${iconClass}"></i>`;
+        userSignalText.className = `text-${textColor.replace("text-", "")}-800 font-semibold text-lg`;
+        userSignalType.className = `text-${textColor.replace("text-", "")}-900 font-extrabold text-2xl`;
+
+        // User signal container border color
+        document.getElementById("user-signal-display").className = `p-8 rounded-2xl border-2 ${borderColor} bg-indigo-50 flex items-center gap-6 shadow-lg min-h-[6rem]`;
+      }
+
+      // Login handler
+      loginForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        loginError.classList.add("hidden");
+        const username = loginForm.username.value.trim();
+        const password = loginForm.password.value;
+
+        if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+          // Admin login success
+          saveLoggedUser(username);
+          loadAdminDashboard();
+          showSection("admin");
+          loginForm.reset();
+          return;
+        }
+
+        // Check user accounts
+        const users = initUsers();
+        const user = users.find(
+          (u) => u.username.toLowerCase() === username.toLowerCase() && u.password === password
+        );
+        if (user) {
+          // User login success
+          saveLoggedUser(user.username);
+          loadUserDashboard();
+          showSection("user");
+          loginForm.reset();
+          return;
+        }
+
+        // Login failed
+        loginError.textContent = "Username atau password salah.";
+        loginError.classList.remove("hidden");
+      });
+
+      // Admin logout
+      adminLogoutBtn.addEventListener("click", () => {
+        removeLoggedUser();
+        showSection("login");
+      });
+
+      // User logout
+      userLogoutBtn.addEventListener("click", () => {
+        removeLoggedUser();
+        showSection("login");
+      });
+
+      // Admin signal form submit
+      signalForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const signal = signalTextInput.value.trim();
+        const type = signalTypeSelect.value;
+
+        if (signal.length === 0 || !type) {
+          alert("Harap pilih tipe signal dan isi signal terlebih dahulu.");
+          return;
+        }
+        saveCurrentSignal(signal);
+        saveCurrentSignalType(type);
+        updateSignalIconAndColors(type);
+        signalTypeDisplay.textContent = type;
+        signalTextDisplay.textContent = signal;
+        userSignalType.textContent = type;
+        userSignalText.textContent = signal;
+        signalForm.reset();
+        signalTypeSelect.selectedIndex = 0;
+      });
+
+      // Admin create user form submit
+      userForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const newUsername = newUsernameInput.value.trim();
+        const newPassword = newPasswordInput.value;
+
+        if (newUsername.length === 0 || newPassword.length === 0) {
+          alert("Username dan password tidak boleh kosong.");
+          return;
+        }
+
+        // Prevent creating admin username
+        if (newUsername.toLowerCase() === ADMIN_USERNAME.toLowerCase()) {
+          alert("Username ini sudah digunakan oleh admin.");
+          return;
+        }
+
+        let users = initUsers();
+        // Check if username already exists
+        if (users.some((u) => u.username.toLowerCase() === newUsername.toLowerCase())) {
+          alert("Username sudah terdaftar, silakan gunakan username lain.");
+          return;
+        }
+
+        users.push({ username: newUsername, password: newPassword });
+        saveUsers(users);
+        renderUserList();
+        userForm.reset();
+        alert("Akun pengguna berhasil dibuat.");
+      });
+
+      // Load admin dashboard data
+      function loadAdminDashboard() {
+        renderUserList();
+        const currentSignal = getCurrentSignal();
+        const currentSignalType = getCurrentSignalType();
+        if (currentSignal.length > 0 && currentSignalType) {
+          signalTextDisplay.textContent = currentSignal;
+          signalTypeDisplay.textContent = currentSignalType;
+          updateSignalIconAndColors(currentSignalType);
+        } else {
+          signalTextDisplay.textContent = "Belum ada signal terkirim.";
+          signalTypeDisplay.textContent = "Belum ada signal";
+          updateSignalIconAndColors("");
+        }
+      }
+
+      // Load user dashboard data
+      function loadUserDashboard() {
+        const currentSignal = getCurrentSignal();
+        const currentSignalType = getCurrentSignalType();
+        if (currentSignal.length > 0 && currentSignalType) {
+          userSignalText.textContent = currentSignal;
+          userSignalType.textContent = currentSignalType;
+          updateSignalIconAndColors(currentSignalType);
+        } else {
+          userSignalText.textContent = "Belum ada signal terkirim oleh admin.";
+          userSignalType.textContent = "Belum ada signal";
+          updateSignalIconAndColors("");
+        }
+      }
+
+      // On page load, check if user is logged in
+      function initApp() {
+        const loggedUser = getLoggedUser();
+        if (!loggedUser) {
+          showSection("login");
+          return;
+        }
+        if (loggedUser === ADMIN_USERNAME) {
+          loadAdminDashboard();
+          showSection("admin");
+        } else {
+          loadUserDashboard();
+          showSection("user");
+        }
+      }
+
+      initApp();
+    })();
+  </script>
+</body>
+        </html>
